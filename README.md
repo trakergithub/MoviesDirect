@@ -8,8 +8,8 @@ Formatos reconocidos *.mp4, *.mpg, *.avi, *.mov, *.mkv
 
 Ejemplo como se muestra el listado de peliculas.
 
-<img src="https://github.com/trakergithub/MoviesDirect/blob/main/Captura1.png" />
+<img src="https://github.com/trakergithub/MoviesDirect/blob/main/files/img/Captura1.png" />
 
 Ejemplo como se muestra cuando seleccionas una pelicula.
 
-<img src="https://github.com/trakergithub/MoviesDirect/blob/main/Captura2.png" />
+<img src="https://github.com/trakergithub/MoviesDirect/blob/main/files/img/Captura2.png" />
