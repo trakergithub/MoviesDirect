@@ -46,7 +46,7 @@
                 
         if($dir=="." or $dir=="./"){
             echo '
-            <div class="content superponer" style="color:#20ffc4be;">
+            <div class="superponer" style="color:#20ffc4be;">
                 <center>
                 <h2><b>Bienvenido a Movies Direct</b></h2>
                 <br>
@@ -291,7 +291,7 @@
                             <p class="titulo">
                                 <b>'.$pelicula.'</b>
                             </p>
-                            <video width="100%" height="auto" id="VideoPlayer" poster="files/img/poster.png" controls preload="none">
+                            <video width="100%" height="auto" id="VideoPlayer" poster="files/img/backdrop.jpg" controls preload="none">
                                 <source src="'.$ruta.'">
                                 Tu navegador no soporta video HTML5 .
                             </video>
@@ -310,7 +310,7 @@
                     
                     <style>
                         .fondobg {
-                            background-image: url("files/md/backdrop'.$arr->backdrop_path.'");
+                            background-image: url("files/img/backdrop.jpg");
                         }
                     </style>
                     <script>
