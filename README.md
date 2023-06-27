@@ -5,3 +5,11 @@ Para el funcionamiento de este debes de clonar este repositorio en tu servidor w
 
 Si deseas agregar categorias o series puedes crear carpetas en raiz, estas apareceran en el menu superior, dentro de cada carpeta puedes poner tus archivos de video para que sean reconocidos.
 Formatos reconocidos *.mp4, *.mpg, *.avi, *.mov, *.mkv
+
+Ejemplo como se muestra el listado de peliculas.
+
+<img src="https://github.com/trakergithub/MoviesDirect/blob/main/Captura1.png" />
+
+Ejemplo como se muestra cuando seleccionas una pelicula.
+
+<img src="https://github.com/trakergithub/MoviesDirect/blob/main/Captura2.png" />
