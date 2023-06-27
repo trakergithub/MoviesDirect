@@ -73,7 +73,13 @@
                     ¡Disfruta de la experiencia cinematográfica en casa con Movies Direct!
                 </h3>
                 <h4>
-                    Para acceder desde otro equipo en la misma red ingresa desde esta ruta http://'.$_SERVER['SERVER_ADDR'].'/md<br>
+                    Para acceder desde otro equipo en la misma red ingresa desde esta ruta http://'.$_SERVER['SERVER_ADDR'].'/md
+                    <br>
+                    Si deseas agregar categorias o series puedes crear carpetas en raiz, estas apareceran en el menu superior,
+                    <br>
+                    dentro de cada carpeta puedes poner tus archivos de video para que sean reconocidos.
+                    <br>
+                    Formatos reconocidos *.mp4, *.mpg, *.avi, *.mov, *.mkv
                 </h4>
                 <h6>
                     Este es un sistema de entretenimiento creado sin fines de lucro por www.creamoscodigo.com
@@ -83,7 +89,7 @@
             
             <style>
                 .fondobg {
-                    background-image: url("files/imagenes/backdrop.jpg");
+                    background-image: url("files/img/backdrop.jpg");
                 }
             </style>
             <script>
@@ -159,7 +165,7 @@
                             document.getElementById(\'formovie\').submit();
                         ">
                             <article class="card">
-                                <img class="poster rounded" src="files/imagenes/poster.png" alt="poster">
+                                <img class="poster rounded" src="files/img/poster.png" alt="poster">
                                 <p class="text single-line">
                                     '.$nombre.'
                                 </p>
@@ -172,7 +178,7 @@
             $contenido.='</main>
                 <style>
                     .fondobg {
-                        background-image: url("files/imagenes/backdrop.jpg");
+                        background-image: url("files/img/backdrop.jpg");
                     }
                 </style>
                 <script>
@@ -285,7 +291,7 @@
                             <p class="titulo">
                                 <b>'.$pelicula.'</b>
                             </p>
-                            <video width="100%" height="auto" id="VideoPlayer" poster="files/imagenes/poster.png" controls preload="none">
+                            <video width="100%" height="auto" id="VideoPlayer" poster="files/img/poster.png" controls preload="none">
                                 <source src="'.$ruta.'">
                                 Tu navegador no soporta video HTML5 .
                             </video>
