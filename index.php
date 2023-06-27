@@ -14,7 +14,7 @@
   </header>
 
   <?php
-     include 'files/controllers/content.php';
+     include 'files/cont/content.php';
   ?>
     
     <div class="fondo fondobg"></div>
