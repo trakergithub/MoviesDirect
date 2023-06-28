@@ -1,5 +1,5 @@
 <?php
-    error_reporting(0);
+    //error_reporting(0);
     
     if($_POST){
         if(isset($_POST['dir'])){
@@ -42,6 +42,7 @@
 
     function contenido($dir='./peliculas'){
         date_default_timezone_set('America/Mexico_City');
+        ini_set('max_execution_time', '300');
         listar_directorios();
                 
         if($dir=="." or $dir=="./"){
@@ -56,8 +57,6 @@
                     ¡Disfruta de la experiencia cinematográfica en casa con Movies Direct!
                 </h3>
                 <h4>
-                    Para acceder desde otro equipo en la misma red ingresa desde esta ruta http://'.$_SERVER['SERVER_ADDR'].'/md
-                    <br>
                     Si deseas agregar categorias o series puedes crear carpetas en raiz, estas apareceran en el menu superior,
                     <br>
                     dentro de cada carpeta puedes poner tus archivos de video para que sean reconocidos.
@@ -227,6 +226,7 @@
     }
     
     function moviedescripcion($pelicula=null, $ruta=null){
+                
         if($pelicula==null){
             contenido('./peliculas');
         }
@@ -252,7 +252,7 @@
                                 </video>
                                 <center>
                                     <br>
-                                    <a href="'.$dir.'" class="btn-menu single-line rounded" target="_self">
+                                    <a href="javascript:history.back()" class="btn-menu single-line rounded" target="_self">
                                     <span class="material-symbols-rounded">arrow_back_ios</span>Regresar
                                     </a>
                                     &nbsp;&nbsp;&nbsp;
@@ -297,7 +297,7 @@
                             </video>
                             <center>
                                 <br>
-                                <a href="'.$dir.'" class="btn-menu single-line rounded" target="_self">
+                                <a href="javascript:history.back()" class="btn-menu single-line rounded" target="_self">
                                 <span class="material-symbols-rounded">arrow_back_ios</span>Regresar
                                 </a>
                                 &nbsp;&nbsp;&nbsp;
@@ -325,6 +325,10 @@
     function RegistroLog($accion=''){
         date_default_timezone_set('America/Mexico_City');
         
+        if(!is_dir('files/logs')){
+            mkdir("files/logs", 0777);
+        }
+        
         $nombreArchivo = 'files/logs/'.$_SERVER["REMOTE_ADDR"].'.txt';
         
         if (!file_exists($nombreArchivo)){
@@ -345,6 +349,15 @@
     }
     
     function RequestTMDB($dir,$nombre){
+        
+        //valida la estructura de carpetas
+        if(!is_dir('files/md')){
+            mkdir("files/md", 0777);
+            mkdir("files/md/json", 0777);
+            mkdir("files/md/poster", 0777);
+            mkdir("files/md/backdrop", 0777);
+        }
+        
         if($dir=='peliculas'){
             $tipo='movie';
         }else{
