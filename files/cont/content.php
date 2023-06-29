@@ -1,5 +1,6 @@
 <?php
     error_reporting(0);
+
     if($_POST){
         if(isset($_POST['dir'])){
             contenido($_POST['dir']);
@@ -34,7 +35,7 @@
         }
         date_default_timezone_set('America/Mexico_City');
         $menu .= '
-                <input class="rounded btn-menu single-line" type="text" id="search-text" style="width:300px; color:#20ffc4b6;" placeholder="Buscar..." autocomplete="off"/><br>
+                    <input class="rounded btn-menu single-line" type="text" id="search-text" style="width:300px; color:#20ffc4b6;" placeholder="Buscar..." autocomplete="off"/><br>
                 </form>
             </div>';
         echo $menu;
@@ -55,7 +56,8 @@
                 <h3>
                     Aquí podrás administrar y ver tus películas almacenadas localmente. <br>
                     Además, de transmitir en la red local y ver información detallada de tus películas favoritas.<br>
-                    ¡Disfruta de la experiencia cinematográfica en casa con Movies Direct!
+                    ¡Disfruta de la experiencia cinematográfica en casa con Movies Direct!<br><br>
+                    Utiliza la siguiente dirección para acceder desde otro equipo <b>http://'.ObtieneIP().'/md<b>
                 </h3>
                 <h4>
                     Si deseas agregar categorias o series puedes crear carpetas en raiz, estas apareceran en el menu superior,
@@ -81,7 +83,7 @@
             ';
             $archivos='inicio';
             RegistroLog('Accedio a inicio');
-            exit();
+            return;
         }
         
         // Escanea el directorio y obtiene los nombres de los archivos
@@ -173,6 +175,7 @@
             }
             
             $contenido.='</main>
+                <br><br><br><br>
                 <style>
                     .fondobg {
                         background-image: url("files/img/backdrop.jpg");
@@ -395,6 +398,7 @@
     }
     
     Function ProgressBar(){
+        $IP = ObtieneIP();
         
         $peliculas = count(scandir('./peliculas'));
         if(file_exists('./files/md/json')){
@@ -407,91 +411,110 @@
         if($restantes==0){
             echo '
             <script>
-                window.location.href = "http://148.202.161.106/md/?ok";
+                window.location.href = "http://'.$IP.'/md/?ok";
             </script>
             }';
         }else{            
-        
-        $total=$restantes*6;
-            //muestra una barra de progreso mientras indexa los archivos
-            echo '
-            <style>
-                #myProgress {
-                width: 100%;
-                height: 31px;
-                background-color: #202023;
-                border: 1px solid #04AA6D;
-                border-radius:5px;
-                }
+            
+            $total=$restantes*6;
+                //muestra una barra de progreso mientras indexa los archivos
+                echo '
+                <style>
+                    #myProgress {
+                    width: 100%;
+                    height: 31px;
+                    background-color: #202023;
+                    border: 1px solid #04AA6D;
+                    border-radius:5px;
+                    }
 
-                #myBar {
-                width: 1%;
-                height: 30px;
-                border-radius:5px;
-                background-color: #04AA6D;
-                float:left;
-                }
-            </style>
+                    #myBar {
+                    width: 1%;
+                    height: 30px;
+                    border-radius:5px;
+                    background-color: #04AA6D;
+                    float:left;
+                    }
+                </style>
 
-            <div class="superponer" style="color:#20ffc4be;">
-                <center>
-                <h2><b>Bienvenido a Movies Direct</b></h2>
-                <br>
-                <h3>
-                    Aquí podrás administrar y ver tus películas almacenadas localmente. <br>
-                    Además, de transmitir en la red local y ver información detallada de tus películas favoritas.<br>
-                    ¡Disfruta de la experiencia cinematográfica en casa con Movies Direct!
-                </h3>
-                <h4>
-                    Si deseas agregar categorias o series puedes crear carpetas en raiz, estas apareceran en el menu superior,
+                <div class="superponer" style="color:#20ffc4be;">
+                    <center>
+                    <h2><b>Bienvenido a Movies Direct</b></h2>
                     <br>
-                    dentro de cada carpeta puedes poner tus archivos de video para que sean reconocidos.
-                    <br>
-                    Formatos reconocidos *.mp4, *.mpg, *.avi, *.mov, *.mkv
-                </h4>
-                <h6>
-                    Este es un sistema de entretenimiento creado sin fines de lucro por www.creamoscodigo.com
-                </h6>
-                
-                <br><br>
-                <div style="width:500px;">
-                    indexando '.$restantes.' archivos <br>
-                    <div id="myProgress">
-                        <div id="myBar"></div>
+                    <h3>
+                        Aquí podrás administrar y ver tus películas almacenadas localmente. <br>
+                        Además, de transmitir en la red local y ver información detallada de tus películas favoritas.<br>
+                        ¡Disfruta de la experiencia cinematográfica en casa con Movies Direct!<br><br>
+                        Utiliza la siguiente dirección para acceder desde otro equipo <b>http://'.$IP.'/md<b>
+                    </h3>
+                    <h4>
+                        Si deseas agregar categorias o series puedes crear carpetas en raiz, estas apareceran en el menu superior,
+                        <br>
+                        dentro de cada carpeta puedes poner tus archivos de video para que sean reconocidos.
+                        <br>
+                        Formatos reconocidos *.mp4, *.mpg, *.avi, *.mov, *.mkv
+                    </h4>
+                    <h6>
+                        Este es un sistema de entretenimiento creado sin fines de lucro por www.creamoscodigo.com
+                    </h6>
+                    
+                    <br><br>
+                    <div style="width:500px;">
+                        indexando '.$restantes.' archivos <br>
+                        <div id="myProgress">
+                            <div id="myBar"></div>
+                        </div>
                     </div>
+                    
+                    </center>
                 </div>
                 
-                </center>
-            </div>
-            
-            <style>
-                .fondobg {
-                    background-image: url("files/img/backdrop.jpg");
-                }
-            </style>
-            <script>
-                var i = 0;
-                function move() {
-                if (i == 0) {
-                    i = 1;
-                    var elem = document.getElementById("myBar");
-                    var width = 1;
-                    var id = setInterval(frame, '.$total.');
-                    function frame() {
-                        if (width >= 100) {
-                            clearInterval(id);
-                            i = 0;
-                        } else {
-                            width++;
-                            elem.style.width = width + "%";
+                <style>
+                    .fondobg {
+                        background-image: url("files/img/backdrop.jpg");
+                    }
+                </style>
+                <script>
+                    var i = 0;
+                    function move() {
+                    if (i == 0) {
+                        i = 1;
+                        var elem = document.getElementById("myBar");
+                        var width = 1;
+                        var id = setInterval(frame, '.$total.');
+                        function frame() {
+                            if (width >= 100) {
+                                clearInterval(id);
+                                i = 0;
+                            } else {
+                                width++;
+                                elem.style.width = width + "%";
+                            }
                         }
                     }
-                }
-                }
-                move();
-                window.location.href = "http://148.202.161.106/md/?ok";
-            </script>
-        ';
+                    }
+                    move();
+                    window.location.href = "http://'.$IP.'/md/?ok";
+                </script>
+            ';
         }
+    }
+    
+    function ObtieneIP(){
+        if(!is_dir('files/logs/')){
+            mkdir("files/logs/", 0777);
+        }
+        
+        if (file_exists('files/logs/server.json')){
+            $IP = file_get_contents( 'files/logs/server.json' );
+        }else{
+            //guarda la ip del servidor
+            $IP = file_get_contents( 'https://api.ipify.org/' );
+            $nombreArchivo = 'files/logs/server.json';
+            $archivo = fopen($nombreArchivo, "w");
+            fwrite($archivo, $IP);
+            fclose($archivo);
+        }
+        return $IP;
     }
 ;?>
