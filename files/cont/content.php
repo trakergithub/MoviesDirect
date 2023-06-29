@@ -1,14 +1,15 @@
 <?php
-    //error_reporting(0);
-    
+    error_reporting(0);
     if($_POST){
         if(isset($_POST['dir'])){
             contenido($_POST['dir']);
         }else if(isset($_POST['inputpelicula'])){
             moviedescripcion($_POST['inputpelicula'],$_POST['rutapelicula']);
         }
-    }else{
+    }elseif(!$_GET){
+        ProgressBar();
         RegistroLog('');
+    }elseif(isset($_GET['ok'])){
         contenido('./peliculas');
     }
 
@@ -99,8 +100,7 @@
         
         // Ordena el array asociativo por los valores de las fechas, de mayor a menor
         arsort($files_with_dates);
-        
-        
+                
         if(isset($files_with_dates) and $files_with_dates!=''){
         
             $contenido ='
@@ -111,10 +111,8 @@
             <br><br>
             <main class="cards" id="peliculas">
         ';
-            
             foreach ($files_with_dates as $file => $date)
             {
-        
                 $ruta="http://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
                 $url = dirname($ruta);
         
@@ -349,7 +347,6 @@
     }
     
     function RequestTMDB($dir,$nombre){
-        
         //valida la estructura de carpetas
         if(!is_dir('files/md')){
             mkdir("files/md", 0777);
@@ -363,11 +360,12 @@
         }else{
             $tipo='tv';
         }
-        $result_url = file_get_contents('https://api.themoviedb.org/3/search/'.$tipo.'?language=es-MX&api_key=cb05d4f190724a88b8fd401d539912cb&query='.str_replace(' ', '+', $nombre));
+        $result_url = file_get_contents('https://api.themoviedb.org/3/search/movie?language=es-MX&api_key=cb05d4f190724a88b8fd401d539912cb&query='.str_replace(' ', '+', $nombre));
         $arr = json_decode($result_url);
-        $jsonfile = json_encode($arr->results[0]);
-        
-        if(isset($arr->results[0])){
+
+        if(isset($arr->results[0]->poster_path)){
+            $jsonfile = json_encode($arr->results[0]);
+            
             //guarda archivo JSON con la informacion
             $nombreArchivo = 'files/md/json/'.$nombre.'.json';
             $archivo = fopen($nombreArchivo, "w");
@@ -375,22 +373,125 @@
             fclose($archivo);
             
             //guarda Poster de la pelicula
-            $poster = file_get_contents( 'https://image.tmdb.org/t/p/w300/'.$arr->results[0]->poster_path );
+            $poster = file_get_contents( 'https://image.tmdb.org/t/p/w300'.$arr->results[0]->poster_path );
             $nombreArchivo = 'files/md/poster/'.$arr->results[0]->poster_path;
             $archivo = fopen($nombreArchivo, "w");
             fwrite($archivo, $poster);
             fclose($archivo);
             
             //guarda Backdrop de la pelicula
-            $poster = file_get_contents( 'https://image.tmdb.org/t/p/original/'.$arr->results[0]->backdrop_path );
+            $backdrop = file_get_contents( 'https://image.tmdb.org/t/p/original'.$arr->results[0]->backdrop_path );
             $nombreArchivo = 'files/md/backdrop/'.$arr->results[0]->backdrop_path;
             $archivo = fopen($nombreArchivo, "w");
-            fwrite($archivo, $poster);
+            fwrite($archivo, $backdrop);
             fclose($archivo);
         }
         
-        $result_url = file_get_contents( 'files/md/json/'.$nombre.'.json' );
-        $arr = json_decode($result_url);
-        return $arr;
+        if (file_exists('files/md/json/'.$nombre.'.json')) {
+            $result_url = file_get_contents( 'files/md/json/'.$nombre.'.json' );
+            $arr = json_decode($result_url);
+            return $arr;
+        }
+    }
+    
+    Function ProgressBar(){
+        
+        $peliculas = count(scandir('./peliculas'));
+        if(file_exists('./files/md/json')){
+            $archivosjson = count(scandir('./files/md/json'));
+        }else{
+            $archivosjson=0;
+        }
+        $restantes=$peliculas-$archivosjson;
+        
+        if($restantes==0){
+            echo '
+            <script>
+                window.location.href = "http://148.202.161.106/md/?ok";
+            </script>
+            }';
+        }else{            
+        
+        $total=$restantes*6;
+            //muestra una barra de progreso mientras indexa los archivos
+            echo '
+            <style>
+                #myProgress {
+                width: 100%;
+                height: 31px;
+                background-color: #202023;
+                border: 1px solid #04AA6D;
+                border-radius:5px;
+                }
+
+                #myBar {
+                width: 1%;
+                height: 30px;
+                border-radius:5px;
+                background-color: #04AA6D;
+                float:left;
+                }
+            </style>
+
+            <div class="superponer" style="color:#20ffc4be;">
+                <center>
+                <h2><b>Bienvenido a Movies Direct</b></h2>
+                <br>
+                <h3>
+                    Aquí podrás administrar y ver tus películas almacenadas localmente. <br>
+                    Además, de transmitir en la red local y ver información detallada de tus películas favoritas.<br>
+                    ¡Disfruta de la experiencia cinematográfica en casa con Movies Direct!
+                </h3>
+                <h4>
+                    Si deseas agregar categorias o series puedes crear carpetas en raiz, estas apareceran en el menu superior,
+                    <br>
+                    dentro de cada carpeta puedes poner tus archivos de video para que sean reconocidos.
+                    <br>
+                    Formatos reconocidos *.mp4, *.mpg, *.avi, *.mov, *.mkv
+                </h4>
+                <h6>
+                    Este es un sistema de entretenimiento creado sin fines de lucro por www.creamoscodigo.com
+                </h6>
+                
+                <br><br>
+                <div style="width:500px;">
+                    indexando '.$restantes.' archivos <br>
+                    <div id="myProgress">
+                        <div id="myBar"></div>
+                    </div>
+                </div>
+                
+                </center>
+            </div>
+            
+            <style>
+                .fondobg {
+                    background-image: url("files/img/backdrop.jpg");
+                }
+            </style>
+            <script>
+                var i = 0;
+                function move() {
+                if (i == 0) {
+                    i = 1;
+                    var elem = document.getElementById("myBar");
+                    var width = 1;
+                    var id = setInterval(frame, '.$total.');
+                    function frame() {
+                        if (width >= 100) {
+                            clearInterval(id);
+                            i = 0;
+                        } else {
+                            width++;
+                            elem.style.width = width + "%";
+                        }
+                    }
+                }
+                }
+                move();
+                window.location.href = "http://148.202.161.106/md/?ok";
+            </script>
+        ';
+        }
     }
 ;?>
