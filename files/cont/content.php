@@ -7,6 +7,9 @@
         }else if(isset($_POST['inputpelicula'])){
             moviedescripcion($_POST['inputpelicula'],$_POST['rutapelicula']);
         }
+        if($_POST['log']){
+            RegistroLog('Play '.$_POST['log']);
+        }
     }elseif(!$_GET){
         ProgressBar();
         RegistroLog('');
@@ -19,7 +22,8 @@
         
         $menu = '<br>
         <div  class="superponer">
-            <form action="#" class="navbar" method="post">
+            <form action="#" id="enrutador" class="navbar" method="post">
+                <input id="ruta" name="dir" type="hidden" value="">
                 <button class="rounded btn-menu single-line" name="dir" value="./" onclick="this.submit()" style="width:auto;"><span class="material-symbols-rounded">home</span> Inicio</button>
         ';
         
@@ -33,9 +37,13 @@
             closedir($dh);
             }
         }
-        date_default_timezone_set('America/Mexico_City');
+        
         $menu .= '
-                    <input class="rounded btn-menu single-line" type="text" id="search-text" style="width:300px; color:#20ffc4b6;" placeholder="Buscar..." autocomplete="off"/><br>
+                    <input class="rounded btn-menu single-line" type="text" id="search-text" style="width:300px; color:#20ffc4b6;" placeholder="Buscar..." autocomplete="off"/> &nbsp;&nbsp;
+                    <span class="rounded" style="color:#c0c0c0; float:right;">
+                        '.UsuariosOnline().' 
+                        <span class="material-symbols-rounded">emoji_people</span> &nbsp;&nbsp;
+                    </span>
                 </form>
             </div>';
         echo $menu;
@@ -92,7 +100,7 @@
         $files_with_dates = array();
         foreach ($files as $file) {
             // Ignora los archivos ocultos y los directorios
-            if ($file[0] != "." && !is_dir($dir . "/" . $file)) {
+            if ($file[0] != "." /*&& !is_dir($dir . "/" . $file)*/) {
             // Obtiene la fecha de modificación del archivo en formato Unix
             $date = filemtime($dir . "/" . $file);
             // Añade el nombre del archivo y la fecha al array asociativo
@@ -117,14 +125,19 @@
             {
                 $ruta="http://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
                 $url = dirname($ruta);
-        
-                $nombre = substr($file,0,-4);
-                $extension = substr(strtolower($file), -3);
+
+                if(is_dir($dir.'/'.$file)){
+                    $nombre = $file;
+                    $extension = 'folder';
+                }else{
+                    $nombre = substr($file,0,-4);
+                    $extension = substr(strtolower($file), -3);
+                }
         
                 if (($extension=="mp4")or($extension=="mpg")or($extension=="avi")or($extension=="mov")or($extension=="mkv")){
                     $tipo='video';
                 }else{
-                    $tipo='';
+                    $tipo='video';
                 }
         
                 if ($tipo<>''){
@@ -138,23 +151,40 @@
                         }
                     }
                 }
-                    
         
-                if(isset($arr->original_title)){
-                    $contenido .='
-                    <a href="#" class="superponer" onclick="
-                        document.getElementById(\'inputpelicula\').value=\''.$nombre.'\'; 
-                        document.getElementById(\'rutapelicula\').value=\''.$dir.'/'.$nombre.'.'.$extension.'\'; 
-                        document.getElementById(\'formovie\').submit();
-                    ">
-                        <article class="card">
-                            <img class="poster rounded" src="files/md/poster'.$arr->poster_path.'" alt="'.$arr->title.'">
-                            <p class="text single-line">
-                                '.$arr->title.'
-                            </p>
-                        </article>
-                    </a>
-                    ';
+                if(isset($arr->original_title) or isset($arr->original_name)){
+                    
+                    if($extension=='folder'){
+                        $contenido .='
+                        <a href="#" class="superponer" onclick="
+                            document.getElementById(\'ruta\').value=\''.$dir.'/'.$nombre.'\'; 
+                            document.getElementById(\'enrutador\').submit();
+                        ">
+                            <article class="card">
+                                <img class="poster rounded" src="files/md/poster'.$arr->poster_path.'" alt="'.$arr->title.'">
+                                <p class="text single-line">
+                                    '.$arr->title.$arr->original_name.'
+                                </p>
+                            </article>
+                        </a>
+                        ';
+                    }else{
+                        $contenido .='
+                        <a href="#" class="superponer" onclick="
+                            document.getElementById(\'inputpelicula\').value=\''.$nombre.'\'; 
+                            document.getElementById(\'rutapelicula\').value=\''.$dir.'/'.$nombre.'.'.$extension.'\'; 
+                            document.getElementById(\'formovie\').submit();
+                        ">
+                            <article class="card">
+                                <img class="poster rounded" src="files/md/poster'.$arr->poster_path.'" alt="'.$arr->title.'">
+                                <p class="text single-line">
+                                    '.$arr->title.$arr->original_name.'
+                                </p>
+                            </article>
+                        </a>
+                        ';
+                    }
+                    
                     
                 }else{
                     $contenido .='
@@ -218,12 +248,11 @@
             ';
             
             echo $contenido;
-            
-            RegistroLog('Accedio al catalogo de peliculas');
                         
         }else{
             echo '<br><br><center><h2 style="color:#20ffc4be;">No hay contenido</h2><center>';
         }
+        RegistroLog('Accedio a '.$dir);
     }
     
     function moviedescripcion($pelicula=null, $ruta=null){
@@ -232,7 +261,7 @@
             contenido('./peliculas');
         }
         
-        RegistroLog('Accedio a la pelicula '.$pelicula);
+        RegistroLog('Accedio a '.$ruta);
         
         listar_directorios();        
         if (file_exists('files/md/json/'.$pelicula.'.json')){
@@ -240,7 +269,7 @@
             $arr = json_decode($result_url);
         }
         
-        if(isset($arr->original_title)){
+        if(isset($arr->original_title) or isset($arr->original_name)){
             $contenido ='
                         <div class="cardinfo superponer">
                             <div class="player">
@@ -265,7 +294,7 @@
 
                             <div class="info">
                                 <p class="datos">
-                                    Titulo original: '.$arr->original_title.' <br>
+                                    Titulo original: '.$arr->original_title.$arr->original_name.' <br>
                                     Lenguaje original: '.$arr->original_language.' <br>
                                     Año de publicación: '.$arr->release_date.'<br>
                                 </p>
@@ -282,7 +311,15 @@
                             }
                         </style>
                         <script>
-                        document.getElementById("search-text").style.display = "none";
+                            document.getElementById("search-text").style.display = "none";
+                            
+                            function logplay(ruta){
+                                $.ajax({
+                                    type: "POST",
+                                    url: "files/cont/content.php",
+                                    data: { log: "Reproduciendo "+ruta }
+                                });
+                            }
                         </script>
             ';
         }else{
@@ -315,7 +352,7 @@
                         }
                     </style>
                     <script>
-                    document.getElementById("search-text").style.display = "none";
+                        document.getElementById("search-text").style.display = "none";
                     </script>
             ';
         }
@@ -363,9 +400,9 @@
         }else{
             $tipo='tv';
         }
-        $result_url = file_get_contents('https://api.themoviedb.org/3/search/movie?language=es-MX&api_key=cb05d4f190724a88b8fd401d539912cb&query='.str_replace(' ', '+', $nombre));
+        $result_url = file_get_contents('https://api.themoviedb.org/3/search/'.$tipo.'?language=es-MX&api_key=cb05d4f190724a88b8fd401d539912cb&query='.str_replace(' ', '+', $nombre));
         $arr = json_decode($result_url);
-
+        
         if(isset($arr->results[0]->poster_path)){
             $jsonfile = json_encode($arr->results[0]);
             
@@ -397,10 +434,10 @@
         }
     }
     
-    Function ProgressBar(){
+    Function ProgressBar($folder='./peliculas'){
         $IP = ObtieneIP();
         
-        $peliculas = count(scandir('./peliculas'));
+        $peliculas = count(scandir($folder));
         if(file_exists('./files/md/json')){
             $archivosjson = count(scandir('./files/md/json'));
         }else{
@@ -505,16 +542,39 @@
             mkdir("files/logs/", 0777);
         }
         
-        if (file_exists('files/logs/server.json')){
-            $IP = file_get_contents( 'files/logs/server.json' );
+        if (file_exists('files/logs/server.txt')){
+            $IP = file_get_contents( 'files/logs/server.txt' );
         }else{
             //guarda la ip del servidor
             $IP = file_get_contents( 'https://api.ipify.org/' );
-            $nombreArchivo = 'files/logs/server.json';
+            $nombreArchivo = 'files/logs/server.txt';
             $archivo = fopen($nombreArchivo, "w");
             fwrite($archivo, $IP);
             fclose($archivo);
         }
         return $IP;
+    }
+    
+    function UsuariosOnline(){
+        date_default_timezone_set('America/Mexico_City');
+        RegistroLog('');
+        /*  OBTENEMOS FECHA Y HORA ACTUAL Y LE RESTAMOS 10 MINUTOS PARA HACER LA COMPARACION **PENDIENTE
+        $mifecha = new DateTime(); 
+        $fechaactual = $mifecha->format('d-m-Y H:i');
+        $mifecha->modify('-10 minute'); 
+        $fechacompara = $mifecha->format('d-m-Y H:i');
+        */
+        
+        $dir = 'files/logs/';
+        $files = scandir($dir);
+        $usuarios = 0;
+        foreach ($files as $file) {
+            if ($file[0] != "." && !is_dir($dir . "/" . $file)) {
+                if(date ("Y-m-d H",time()) == date ("Y-m-d H", filemtime($dir . "/" . $file))){
+                    $usuarios ++;
+                }
+            }
+        }
+        return $usuarios;
     }
 ;?>
