@@ -10,7 +10,7 @@
 
   <body>
     <header>
-      <span width="90%" class="single-line"><img height='100%' src='files/img/pcmd.png' /> La manera mas sencilla de ver tus películas favoritas </span>
+    <img height='100%' src='files/img/pcmd.png' /><span width="100%" class="single-line">La manera mas sencilla de ver tus películas</span>
     </header>
 
     <?php
