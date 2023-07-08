@@ -395,7 +395,7 @@
             mkdir("files/md/backdrop", 0777);
         }
         
-        if($dir=='peliculas'){
+        if($dir=='peliculas' or $dir=='./peliculas'){
             $tipo='movie';
         }else{
             $tipo='tv';
